@@ -1,12 +1,12 @@
 import { Router } from 'express'
 import { createCustomer, deleteCustomer, fetchCustomer, fetchCustomerByID, updateCustomer } from '../controller/customer.controller.js'
 
-const router = Router()
+const customerRouter = Router()
 
-router.post('/' , createCustomer)
-router.get('/', fetchCustomer)
-router.get('/:id' , fetchCustomerByID)
-router.put('/:id', updateCustomer)
-router.delete('/:id' , deleteCustomer)
+customerRouter.post('/' , createCustomer)
+customerRouter.get('/', fetchCustomer)
+customerRouter.get('/:id' , fetchCustomerByID)
+customerRouter.put('/:id', updateCustomer)
+customerRouter.delete('/:id' , deleteCustomer)
 
-export default router
+export default customerRouter

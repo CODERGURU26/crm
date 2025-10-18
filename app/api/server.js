@@ -5,6 +5,7 @@ import express from "express";
 import mongoose from "mongoose";
 import customerRouter from './routers/customer.router.js'
 import bodyParser from "body-parser";
+import logRouter from "./routers/logs.router.js";
 
 const PORT = process.env.PORT || 8080;
 const DB_URL = process.env.DB_URL;
@@ -21,5 +22,6 @@ const app = express();
 app.use(bodyParser.urlencoded({extended : false}))
 app.use(bodyParser.json())
 app.use('/customer' , customerRouter)
+app.use('/logs' , logRouter)
 
 app.listen(PORT, () => console.log(`Server Running On Port ${PORT}`));

@@ -1,4 +1,4 @@
-import {model , Schema} from 'mongoose'
+import mongoose, {model , Schema} from 'mongoose'
 
 const customerSchema = new Schema({
     fullname : {
@@ -20,5 +20,6 @@ const customerSchema = new Schema({
     }
 } , {timestamps : true})
 
+mongoose.models = {}
 const customerModel = model("Customer" , customerSchema)
 export default customerModel

@@ -8,11 +8,10 @@ const logSchema = new Schema({
     }, 
     startsAt : {
         type : Date,
-        required : true
     },
     endsAt : {
         type : Date,
-        required : true
+        
     }, 
     followUp : {
         type : Date
@@ -24,5 +23,12 @@ const logSchema = new Schema({
     }
 } , {timestamps : true})
 
+mongoose.models = {}
+
+logSchema.pre('save' , function(next){
+    this.startsAt = Date.now()
+    this.endsAt = Date.now()
+    next()
+})
 const logModel = model('Logs' , logSchema)
 export default logModel
