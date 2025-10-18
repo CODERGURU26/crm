@@ -12,6 +12,11 @@ const customerSchema = new Schema({
     mobile : {
         type : String,
         required : true
+    },
+    status : {
+        type : String,
+        enum : ['pending' , 'cold' , 'hot' , 'closed' , 'denied'],
+        default : 'pending'
     }
 } , {timestamps : true})
 
