@@ -1,14 +1,41 @@
 'use client'
 import fetcher from "@/app/lib/fetcher";
+import { Skeleton, Table } from "antd";
 import useSWR from "swr";
 
 const CustomersPage = () => {
-   const{data , error} =  useSWR('/customer' , fetcher)
+   const{data , error , isLoading} =  useSWR('/customer' , fetcher)
    console.log(data , error)
+
+   if(isLoading)
+    return <Skeleton/>
+
+   const column = [
+        {
+            key : 'fullname',
+            title : 'Fullname',
+            dataIndex : 'fullname'
+        },
+        {
+            key : 'email',
+            title : 'Email',
+            dataIndex : 'email'
+        },
+        {
+            key : 'mobile',
+            title : 'Mobile',
+            dataIndex : 'mobile'
+        }
+   ]
   return (
     <>
-      <h1>👥 Customers</h1>
-      <p>Manage your customer data here.</p>
+      <div>
+        <Table
+            columns={column}
+            dataSource={data}
+            rowKey="_id"
+        />
+      </div>
     </>
   );
 };
