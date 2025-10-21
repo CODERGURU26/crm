@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import customerRouter from './routers/customer.router.js'
 import bodyParser from "body-parser";
 import logRouter from "./routers/logs.router.js";
+import cors from 'cors'
 
 const PORT = process.env.PORT || 8080;
 const DB_URL = process.env.DB_URL;
@@ -19,6 +20,7 @@ mongoose
 
 const app = express();
 
+app.use(cors())
 app.use(bodyParser.urlencoded({extended : false}))
 app.use(bodyParser.json())
 app.use('/customer' , customerRouter)
