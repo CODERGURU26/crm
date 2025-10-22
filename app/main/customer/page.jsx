@@ -4,6 +4,7 @@ import { DeleteOutlined, EditOutlined, SearchOutlined, UserAddOutlined } from "@
 import { Button, Divider, Form, Input, Modal, Skeleton, Table } from "antd";
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
+import '@ant-design/v5-patch-for-react-19';
 import useSWR, { mutate } from "swr";
 import axios from "axios";
 import { useState } from "react";
@@ -62,8 +63,17 @@ const CustomersPage = () => {
         <>
             <div>
                 <div className="flex gap-2 mb-5">
-                    <Input placeholder="Search Customer" prefix={<SearchOutlined className="!text-gray-500 mr-1"/>} />
-                    <Button size="large" type="primary" className="!bg-indigo-600" icon={<UserAddOutlined />}>Add Customer</Button>
+                    <Input 
+                    placeholder="Search Customer" 
+                    prefix={<SearchOutlined
+                    className="!text-gray-500 mr-1"/>} />
+
+                    <Button 
+                    size="large" 
+                    type="primary" 
+                    className="!bg-indigo-600" 
+                    icon={<UserAddOutlined/>}
+                    onClick={()=>setOpen(true)}>Add Customer</Button>
                 </div>
                 <Divider/>
                 <Table
@@ -71,7 +81,7 @@ const CustomersPage = () => {
                     dataSource={data}
                     rowKey="_id"
                 />
-                <Modal open={open} footer={null} title="Add Customers">
+                <Modal onCancel={()=>setOpen(false)} maskClosable={false} open={open} footer={null} title="Add Customers">
                     <Divider />
 
                     <Form layout="vertical" onFinish={addCustomer}>
