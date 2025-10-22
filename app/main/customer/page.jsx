@@ -1,7 +1,7 @@
 'use client'
 import fetcher from "@/app/lib/fetcher";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { Button, Skeleton, Table } from "antd";
+import { Button, Divider, Form, Input, Modal, Skeleton, Table } from "antd";
 import useSWR, { mutate } from "swr";
 import axios from "axios";
 
@@ -58,6 +58,38 @@ const CustomersPage = () => {
                     dataSource={data}
                     rowKey="_id"
                 />
+                <Modal open footer={null} title="Add Customers">
+                <Divider/>
+
+                <Form layout="vertical">
+                    <Form.Item
+                        label="Customers Name:"  
+                        rules={[{required : true}]} 
+                        name="fullname"                 
+                    >
+                        <Input size="large" placeholder="Mr. Gururaj"/>
+                    </Form.Item>
+
+                      <Form.Item
+                        label="Email:"  
+                        rules={[{required : true}]} 
+                        name="email"                    
+                    >
+                        <Input size="large" placeholder="example@gmail.com"/>
+                    </Form.Item>
+
+                      <Form.Item
+                        label="Mobile:"  
+                        rules={[{required : true}]} 
+                        name="mobile"                    
+                    >
+                        <Input size="large" placeholder="+91 9999999999"/>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button size="large" htmlType="submit">Add Now</Button>
+                    </Form.Item>
+                </Form>
+                </Modal>
             </div>
         </>
     );
