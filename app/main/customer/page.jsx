@@ -8,14 +8,23 @@ import '@ant-design/v5-patch-for-react-19';
 import useSWR, { mutate } from "swr";
 import axios from "axios";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const CustomersPage = () => {
     const { data, error, isLoading } = useSWR('/customer', fetcher)
     console.log(data, error)
     const [open, setOpen] = useState(false)
 
-    const addCustomer = (values) => {
-
+    const addCustomer = async (values) => {
+        try {
+            const { data } = await axios.post('/customer', values)
+            console.log(data)
+            toast.success('Customer Added Successfully!' , {position: 'top-center'})
+            setOpen(false)
+            mutate('/customer')
+        } catch (err) {
+            toast.error(err.message , {position : 'top-center'})
+        }
     }
 
     if (isLoading)
@@ -36,6 +45,11 @@ const CustomersPage = () => {
             key: 'mobile',
             title: 'Mobile',
             dataIndex: 'mobile'
+        },
+        {
+            key : 'created',
+            title : 'Created',
+            dataIndex : 'createdAt'
         },
         {
             key: 'actions',
@@ -63,25 +77,25 @@ const CustomersPage = () => {
         <>
             <div>
                 <div className="flex gap-2 mb-5">
-                    <Input 
-                    placeholder="Search Customer" 
-                    prefix={<SearchOutlined
-                    className="!text-gray-500 mr-1"/>} />
+                    <Input
+                        placeholder="Search Customer"
+                        prefix={<SearchOutlined
+                            className="!text-gray-500 mr-1" />} />
 
-                    <Button 
-                    size="large" 
-                    type="primary" 
-                    className="!bg-indigo-600" 
-                    icon={<UserAddOutlined/>}
-                    onClick={()=>setOpen(true)}>Add Customer</Button>
+                    <Button
+                        size="large"
+                        type="primary"
+                        className="!bg-indigo-600"
+                        icon={<UserAddOutlined />}
+                        onClick={() => setOpen(true)}>Add Customer</Button>
                 </div>
-                <Divider/>
+                <Divider />
                 <Table
                     columns={column}
                     dataSource={data}
                     rowKey="_id"
                 />
-                <Modal onCancel={()=>setOpen(false)} maskClosable={false} open={open} footer={null} title="Add Customers">
+                <Modal onCancel={() => setOpen(false)} maskClosable={false} open={open} footer={null} title="Add Customers">
                     <Divider />
 
                     <Form layout="vertical" onFinish={addCustomer}>

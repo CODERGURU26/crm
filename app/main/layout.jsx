@@ -10,6 +10,9 @@ import {
 import { Button, Layout, Menu, theme } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const { Header, Sider, Content } = Layout;
 
@@ -73,6 +76,7 @@ const MainLayout = ({ children }) => {
           }}
         >
           {children}
+          <ToastContainer/>
         </Content>
       </Layout>
     </Layout>

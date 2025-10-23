@@ -11,7 +11,7 @@ export const createCustomer = async(req , res)=>{
 }
 
 export const fetchCustomer = async (req , res)=>{
-    const customer = await customerModel.find()
+    const customer = await customerModel.find().sort({createdAt : -1})
     res.json(customer)
 }
 
