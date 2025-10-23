@@ -9,6 +9,7 @@ import useSWR, { mutate } from "swr";
 import axios from "axios";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import moment from "moment/moment";
 
 const CustomersPage = () => {
     const { data, error, isLoading } = useSWR('/customer', fetcher)
@@ -49,7 +50,9 @@ const CustomersPage = () => {
         {
             key : 'created',
             title : 'Created',
-            dataIndex : 'createdAt'
+            render : (item)=>(
+                <label>{moment(item.createdAt).format('DD MMM YYYY, hh:mm A')}</label>
+            )
         },
         {
             key: 'actions',
