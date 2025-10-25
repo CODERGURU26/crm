@@ -10,6 +10,7 @@ import axios from "axios";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import moment from "moment/moment";
+import lodash from 'lodash'
 
 const CustomersPage = () => {
     const { data, error, isLoading } = useSWR('/customer', fetcher)
@@ -29,20 +30,18 @@ const CustomersPage = () => {
         }
     }
 
-const onSearch = (event) => {
-  const key = event.target.value.trim().toLowerCase();
+const onSearch = lodash.debounce((event)=>{
+    const key = event.target.value.trim().toLowerCase()
 
-  if (!key) {
-    setFilter(data);
-    return;
-  }
+    if(!key){
+        setFilter(data)
+        return
+    }
 
-  const filtered = data.filter((item) =>
-    item.fullname.toLowerCase().includes(key)
-  );
+    const filtered = data.filter((item)=>item.fullname.toLowerCase().includes(key))
 
-  setFilter(filtered);
-};
+    setFilter(filtered)
+}, 500)
 
     if (isLoading)
         return <Skeleton />
