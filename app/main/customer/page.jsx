@@ -15,6 +15,7 @@ const CustomersPage = () => {
     const { data, error, isLoading } = useSWR('/customer', fetcher)
     console.log(data, error)
     const [open, setOpen] = useState(false)
+    const [filter , setFilter] = useState([])
 
     const addCustomer = async (values) => {
         try {
@@ -27,6 +28,22 @@ const CustomersPage = () => {
             toast.error(err.message , {position : 'top-center'})
         }
     }
+
+const onSearch = (event) => {
+  const key = event.target.value.trim().toLowerCase();
+
+  if (!key) {
+    // if the search box is empty, show all customers
+    setFilter(data);
+    return;
+  }
+
+  const filtered = data.filter((item) =>
+    item.fullname.toLowerCase().includes(key)
+  );
+
+  setFilter(filtered);
+};
 
     if (isLoading)
         return <Skeleton />
@@ -83,7 +100,9 @@ const CustomersPage = () => {
                     <Input
                         placeholder="Search Customer"
                         prefix={<SearchOutlined
-                            className="!text-gray-500 mr-1" />} />
+                        className="!text-gray-500 mr-1" />} 
+                        onChange={onSearch}
+                        />
 
                     <Button
                         size="large"
@@ -95,7 +114,7 @@ const CustomersPage = () => {
                 <Divider />
                 <Table
                     columns={column}
-                    dataSource={data}
+                    dataSource={filter}
                     rowKey="_id"
                 />
                 <Modal onCancel={() => setOpen(false)} maskClosable={false} open={open} footer={null} title="Add Customers">
