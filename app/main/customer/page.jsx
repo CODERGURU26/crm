@@ -33,7 +33,6 @@ const onSearch = (event) => {
   const key = event.target.value.trim().toLowerCase();
 
   if (!key) {
-    // if the search box is empty, show all customers
     setFilter(data);
     return;
   }
