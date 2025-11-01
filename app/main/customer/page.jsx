@@ -1,6 +1,6 @@
 'use client'
 import fetcher from "@/app/lib/fetcher";
-import { DeleteOutlined, EditOutlined, ImportOutlined, SearchOutlined, UserAddOutlined } from "@ant-design/icons";
+import { DeleteOutlined, DownloadOutlined, EditOutlined, ImportOutlined, SearchOutlined, UploadOutlined, UserAddOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, Input, Modal, Skeleton, Table } from "antd";
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
@@ -15,6 +15,7 @@ import lodash from 'lodash'
 const CustomersPage = () => {
     const { data, error, isLoading } = useSWR('/customer', fetcher)
     console.log(data, error)
+    const[importCustomer , setImportCustomer] = useState(true)
     const [open, setOpen] = useState(false)
     const [filter, setFilter] = useState([])
 
@@ -43,6 +44,14 @@ const CustomersPage = () => {
         setFilter(filtered)
     }, 500)
 
+    
+    const downloadSample = ()=>{
+        const a = document.createElement("a")
+        a.href = "/Sample.xlsx"
+        a.download = 'Sample.xlxs'
+        a.click()
+        a.remove()
+    }
     if (isLoading)
         return <Skeleton />
 
@@ -158,6 +167,23 @@ const CustomersPage = () => {
                             <Button icon={<UserAddOutlined />} type="primary" size="large" htmlType="submit">Add Now</Button>
                         </Form.Item>
                     </Form>
+                </Modal>
+
+                <Modal open={importCustomer} footer={null} title="Import Customer Records">
+                 <Divider/>
+                <div className="grid grid-cols-2">
+                    <div className="space-y-4">
+                        <h1 className="text-lg font-semibold">Download XLS File Format</h1>
+                        <Button icon={<DownloadOutlined/>} size="large" onClick={downloadSample}>Download Sample</Button>
+                    </div>
+                    <div className="flex justify-center">
+                        <Button className="!w-[100px] !h-[100px] flex flex-col !text-lg" > 
+                            <UploadOutlined className="text-3xl"/>
+                            Upload XLS
+                           
+                            </Button>
+                    </div>
+                </div>           
                 </Modal>
             </div>
         </>
