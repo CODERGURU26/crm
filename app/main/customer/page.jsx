@@ -1,6 +1,6 @@
 'use client'
 import fetcher from "@/app/lib/fetcher";
-import { DeleteOutlined, EditOutlined, SearchOutlined, UserAddOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, ImportOutlined, SearchOutlined, UserAddOutlined } from "@ant-design/icons";
 import { Button, Divider, Form, Input, Modal, Skeleton, Table } from "antd";
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
@@ -16,32 +16,32 @@ const CustomersPage = () => {
     const { data, error, isLoading } = useSWR('/customer', fetcher)
     console.log(data, error)
     const [open, setOpen] = useState(false)
-    const [filter , setFilter] = useState([])
+    const [filter, setFilter] = useState([])
 
     const addCustomer = async (values) => {
         try {
             const { data } = await axios.post('/customer', values)
             console.log(data)
-            toast.success('Customer Added Successfully!' , {position: 'top-center'})
+            toast.success('Customer Added Successfully!', { position: 'top-center' })
             setOpen(false)
             mutate('/customer')
         } catch (err) {
-            toast.error(err.message , {position : 'top-center'})
+            toast.error(err.message, { position: 'top-center' })
         }
     }
 
-const onSearch = lodash.debounce((event)=>{
-    const key = event.target.value.trim().toLowerCase()
+    const onSearch = lodash.debounce((event) => {
+        const key = event.target.value.trim().toLowerCase()
 
-    if(!key){
-        setFilter(data)
-        return
-    }
+        if (!key) {
+            setFilter(data)
+            return
+        }
 
-    const filtered = data.filter((item)=>item.fullname.toLowerCase().includes(key))
+        const filtered = data.filter((item) => item.fullname.toLowerCase().includes(key))
 
-    setFilter(filtered)
-}, 500)
+        setFilter(filtered)
+    }, 500)
 
     if (isLoading)
         return <Skeleton />
@@ -63,9 +63,9 @@ const onSearch = lodash.debounce((event)=>{
             dataIndex: 'mobile'
         },
         {
-            key : 'created',
-            title : 'Created',
-            render : (item)=>(
+            key: 'created',
+            title: 'Created',
+            render: (item) => (
                 <label>{moment(item.createdAt).format('DD MMM YYYY, hh:mm A')}</label>
             )
         },
@@ -98,21 +98,30 @@ const onSearch = lodash.debounce((event)=>{
                     <Input
                         placeholder="Search Customer"
                         prefix={<SearchOutlined
-                        className="!text-gray-500 mr-1" />} 
+                            className="!text-gray-500 mr-1" />}
                         onChange={onSearch}
-                        />
+                    />
+
+                    <Button
+                        size="large"
+                        icon={<ImportOutlined />}
+                        onClick={() => setOpen(true)}>Import Customer
+                    </Button>
 
                     <Button
                         size="large"
                         type="primary"
                         className="!bg-indigo-600"
                         icon={<UserAddOutlined />}
-                        onClick={() => setOpen(true)}>Add Customer</Button>
+                        onClick={() => setOpen(true)}>Add Customer
+                    </Button>
+
+
                 </div>
                 <Divider />
                 <Table
                     columns={column}
-                    dataSource={filter}
+                    dataSource={filter.length > 0 ? filter : data}
                     rowKey="_id"
                 />
                 <Modal onCancel={() => setOpen(false)} maskClosable={false} open={open} footer={null} title="Add Customers">
