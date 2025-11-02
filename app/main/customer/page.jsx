@@ -52,6 +52,10 @@ const CustomersPage = () => {
         a.click()
         a.remove()
     }
+
+    const ImportXlsFile = ()=>{
+
+    }
     if (isLoading)
         return <Skeleton />
 
@@ -177,10 +181,15 @@ const CustomersPage = () => {
                         <Button icon={<DownloadOutlined/>} size="large" onClick={downloadSample}>Download Sample</Button>
                     </div>
                     <div className="flex justify-center">
-                        <Button className="!w-[100px] !h-[100px] flex flex-col !text-lg" > 
+                        <Button className="!w-[100px] !h-[100px] flex flex-col !text-lg relative" > 
                             <UploadOutlined className="text-3xl"/>
                             Upload XLS
-                           
+                            <Input 
+                            type="file"
+                            accept=".xls" 
+                            className="!w-full !h-full !absolute !top-0 !left-0 !opacity-0 "
+                            onChange={ImportXlsFile}
+                            />
                             </Button>
                     </div>
                 </div>           
