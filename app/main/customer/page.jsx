@@ -11,6 +11,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import moment from "moment/moment";
 import lodash from 'lodash'
+import * as XLS from 'xlsx'
 
 const CustomersPage = () => {
     const { data, error, isLoading } = useSWR('/customer', fetcher)
@@ -53,8 +54,26 @@ const CustomersPage = () => {
         a.remove()
     }
 
-    const ImportXlsFile = ()=>{
+    const ImportXlsFile = (e)=>{
+        const input = e.target
+        const file = input.files[0]
 
+        if(file.type !== "application/vnd.ms-excel")
+            return toast.error("Invalid File Format!" , {position : "top-center"})  
+
+        const reader = new FileReader()
+        reader.readAsArrayBuffer(file)
+
+        reader.onload = (e)=>{
+            const result = new Uint8Array(e.target.result)
+            const excelFile =  XLS.read(result , {type : "array"})
+            const key = excelFile.SheetNames[0]
+            const sheet = excelFile.Sheets[key]
+            const data =  XLS.utils.sheet_to_json(sheet)
+            console.log(data)
+
+        }
+        console.log(file)
     }
     if (isLoading)
         return <Skeleton />
@@ -186,7 +205,7 @@ const CustomersPage = () => {
                             Upload XLS
                             <Input 
                             type="file"
-                            accept=".xls" 
+                            accept=".xls " 
                             className="!w-full !h-full !absolute !top-0 !left-0 !opacity-0 "
                             onChange={ImportXlsFile}
                             />
