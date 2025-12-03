@@ -2,7 +2,7 @@ import customerModel from "../models/customer.model.js"
 
 export const createCustomer = async(req , res)=>{
    try{
-     const customer = new customerModel(req.body)
+     const customer = await customerModel.create(req.body)
     await customer.save()
     res.json(customer)
    }catch(err){

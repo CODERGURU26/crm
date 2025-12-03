@@ -16,8 +16,7 @@ import * as XLS from 'xlsx'
 const CustomersPage = () => {
     const { data, error, isLoading } = useSWR('/customer', fetcher)
     console.log(data, error)
-    const [records , setRecords] = useState([])
-    const[importCustomer , setImportCustomer] = useState(true)
+    const[importCustomer , setImportCustomer] = useState(false)
     const [open, setOpen] = useState(false)
     const [filter, setFilter] = useState([])
 
@@ -27,6 +26,7 @@ const CustomersPage = () => {
             console.log(data)
             toast.success('Customer Added Successfully!', { position: 'top-center' })
             setOpen(false)
+            setImportCustomer(false)
             mutate('/customer')
         } catch (err) {
             toast.error(err.message, { position: 'top-center' })
@@ -86,6 +86,8 @@ const CustomersPage = () => {
                     })
                 }
             }
+
+            addCustomer(temp)
         }
         console.log(file)
     }
@@ -151,7 +153,7 @@ const CustomersPage = () => {
                     <Button
                         size="large"
                         icon={<ImportOutlined />}
-                        onClick={() => setOpen(true)}>Import Customer
+                        onClick={() => setImportCustomer(true)}>Import Customer
                     </Button>
 
                     <Button
@@ -206,7 +208,7 @@ const CustomersPage = () => {
                     </Form>
                 </Modal>
 
-                <Modal open={importCustomer} footer={null} title="Import Customer Records">
+                <Modal open={importCustomer} footer={null} title="Import Customer Records" onCancel={()=> setImportCustomer(false)}>
                  <Divider/>
                 <div className="grid grid-cols-2">
                     <div className="space-y-4">
