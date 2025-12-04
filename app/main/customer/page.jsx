@@ -18,6 +18,11 @@ const CustomersPage = () => {
     const [importCustomer, setImportCustomer] = useState(false)
     const [open, setOpen] = useState(false)
     const [filter, setFilter] = useState([])
+    const [editOpen, setEditOpen] = useState(false)
+    const [editingCustomer, setEditingCustomer] = useState(null)
+
+    const [form] = Form.useForm()
+    const [editForm] = Form.useForm()
 
     // ✅ Handles both single and bulk insert
     const addCustomer = async (values) => {
@@ -32,7 +37,8 @@ const CustomersPage = () => {
         }
     }
 
-     const updateCustomer = async (values) => {
+    // ✅ Update Customer
+    const updateCustomer = async (values) => {
         try {
             const { data } = await axios.put(`/customer/${editingCustomer._id}`, values)
             toast.success('Customer Updated Successfully!', { position: 'top-center' })
@@ -135,8 +141,20 @@ const CustomersPage = () => {
             title: 'Actions',
             render: (item) => (
                 <div className="flex gap-2">
-                    <Button icon={<EditOutlined />} className="!text-violet-600 !border-violet-600 !border-2" />
-                    <Button onClick={() => deleteCustomers(item._id)} icon={<DeleteOutlined />} className="!text-rose-600 !border-rose-600 !border-2" />
+                    <Button
+                        icon={<EditOutlined />}
+                        className="!text-violet-600 !border-violet-600 !border-2"
+                        onClick={() => {
+                            setEditingCustomer(item)
+                            setEditOpen(true)
+                            editForm.setFieldsValue(item)
+                        }}
+                    />
+                    <Button
+                        onClick={() => deleteCustomers(item._id)}
+                        icon={<DeleteOutlined />}
+                        className="!text-rose-600 !border-rose-600 !border-2"
+                    />
                 </div>
             )
         }
@@ -183,7 +201,7 @@ const CustomersPage = () => {
                 {/* Add Customer Modal */}
                 <Modal onCancel={() => setOpen(false)} maskClosable={false} open={open} footer={null} title="Add Customers">
                     <Divider />
-                    <Form layout="vertical" onFinish={addCustomer}>
+                    <Form form={form} layout="vertical" onFinish={addCustomer}>
                         <Form.Item label="Customers Name:" rules={[{ required: true }]} name="fullname">
                             <Input size="large" placeholder="Mr. Gururaj" />
                         </Form.Item>
@@ -199,6 +217,30 @@ const CustomersPage = () => {
                     </Form>
                 </Modal>
 
+                {/* Edit Customer Modal */}
+                <Modal onCancel={() => setEditOpen(false)} maskClosable={false} open={editOpen} footer={null} title="Edit Customer">
+                    <Divider />
+                    <Form form={editForm} layout="vertical" onFinish={updateCustomer}>
+                        <Form.Item label="Customers Name:" rules={[{ required: true }]} name="fullname">
+                            <Input size="large" />
+                        </Form.Item>
+                        <Form.Item label="Email:" rules={[{ required: true }]} name="email">
+                            <Input size="large" />
+                        </Form.Item>
+                        <Form.Item label="Mobile:" rules={[{ required: true }]} name="mobile">
+                            <PhoneInput
+                                country={'in'}
+                                inputClass="!w-full"
+                                value={editingCustomer?.mobile}
+                                onChange={(value) => editForm.setFieldsValue({ mobile: value })}
+                            />
+                        </Form.Item>
+                        <Form.Item>
+                            <Button icon={<EditOutlined />} type="primary" size="large" htmlType="submit">Update Now</Button>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+
                 {/* Import Customer Modal */}
                 <Modal open={importCustomer} footer={null} title="Import Customer Records" onCancel={() => setImportCustomer(false)}>
                     <Divider />
@@ -207,7 +249,7 @@ const CustomersPage = () => {
                             <h1 className="text-lg font-semibold">Download XLS File Format</h1>
                             <Button icon={<DownloadOutlined />} size="large" onClick={downloadSample}>Download Sample</Button>
                         </div>
-                        <div className="flex justify-center">
+                                                <div className="flex justify-center">
                             <Button className="!w-[100px] !h-[100px] flex flex-col !text-lg relative">
                                 <UploadOutlined className="text-3xl" />
                                 Upload XLS
