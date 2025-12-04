@@ -15,16 +15,15 @@ import * as XLS from 'xlsx'
 
 const CustomersPage = () => {
     const { data, error, isLoading } = useSWR('/customer', fetcher)
-    console.log(data, error)
-    const[importCustomer , setImportCustomer] = useState(false)
+    const [importCustomer, setImportCustomer] = useState(false)
     const [open, setOpen] = useState(false)
     const [filter, setFilter] = useState([])
 
+    // ✅ Handles both single and bulk insert
     const addCustomer = async (values) => {
         try {
             const { data } = await axios.post('/customer', values)
-            console.log(data)
-            toast.success('Customer Added Successfully!', { position: 'top-center' })
+            toast.success(`${Array.isArray(data) ? data.length : 1} Customer(s) Added Successfully!`, { position: 'top-center' })
             setOpen(false)
             setImportCustomer(false)
             mutate('/customer')
@@ -33,66 +32,68 @@ const CustomersPage = () => {
         }
     }
 
+    // ✅ Search with debounce
     const onSearch = lodash.debounce((event) => {
         const key = event.target.value.trim().toLowerCase()
-
         if (!key) {
             setFilter(data)
             return
         }
-
         const filtered = data.filter((item) => item.fullname.toLowerCase().includes(key))
-
         setFilter(filtered)
     }, 500)
 
-    
-    const downloadSample = ()=>{
+    // ✅ Download sample file
+    const downloadSample = () => {
         const a = document.createElement("a")
         a.href = "/Sample.xlsx"
-        a.download = 'Sample.xlxs'
+        a.download = 'Sample.xlsx'
         a.click()
         a.remove()
     }
 
-    const ImportXlsFile = (e)=>{
+    // ✅ Import Excel file with header normalization
+    const ImportXlsFile = (e) => {
         const input = e.target
         const file = input.files[0]
         const ext = file.name.split(".").pop()
 
-        if(ext !== "xls" && ext !== "xlsx")
-            return toast.error("Invalid File Format!" , {position : "top-center"})  
+        if (ext !== "xls" && ext !== "xlsx")
+            return toast.error("Invalid File Format!", { position: "top-center" })
 
         const reader = new FileReader()
         reader.readAsArrayBuffer(file)
 
-        reader.onload = (e)=>{
+        reader.onload = (e) => {
             const temp = []
             const result = new Uint8Array(e.target.result)
-            const excelFile =  XLS.read(result , {type : "array"})
+            const excelFile = XLS.read(result, { type: "array" })
             const key = excelFile.SheetNames[0]
             const sheet = excelFile.Sheets[key]
-            const data =  XLS.utils.sheet_to_json(sheet)
-            
-            if(data.length === 0 )
-                return toast.error('File Is Empty!' , {position :"top-center"})
+            const data = XLS.utils.sheet_to_json(sheet)
 
-            for(let item of data){
-                if(item.fullname && item.email && item.mobile){
-                    temp.push({
-                        fullname : item.fullname,
-                        email : item.email,
-                        mobile : item.mobile
-                    })
+            if (data.length === 0)
+                return toast.error('File Is Empty!', { position: "top-center" })
+
+            for (let item of data) {
+                const fullname = item["Full Name"] || item.fullname
+                const email = item["Email"] || item.email
+                const mobile = item["Mobile"] || item.mobile
+
+                if (fullname && email && mobile) {
+                    temp.push({ fullname, email, mobile })
                 }
             }
 
-            addCustomer(temp)
+            if (temp.length > 0) {
+                addCustomer(temp)
+            } else {
+                toast.error("No valid records found!", { position: "top-center" })
+            }
         }
-        console.log(file)
     }
-    if (isLoading)
-        return <Skeleton />
+
+    if (isLoading) return <Skeleton />
 
     const column = [
         {
@@ -120,18 +121,12 @@ const CustomersPage = () => {
         {
             key: 'actions',
             title: 'Actions',
-            render: (item) => {
-                return (
-                    <div className="flex gap-2">
-                        <div>
-                            <Button icon={<EditOutlined />} className="!text-violet-600 !border-violet-600 !border-2" />
-                        </div>
-                        <div>
-                            <Button onClick={() => deleteCustomers(item._id)} icon={<DeleteOutlined />} className="!text-rose-600 !border-rose-600 !border-2" />
-                        </div>
-                    </div>
-                )
-            }
+            render: (item) => (
+                <div className="flex gap-2">
+                    <Button icon={<EditOutlined />} className="!text-violet-600 !border-violet-600 !border-2" />
+                    <Button onClick={() => deleteCustomers(item._id)} icon={<DeleteOutlined />} className="!text-rose-600 !border-rose-600 !border-2" />
+                </div>
+            )
         }
     ]
 
@@ -139,14 +134,14 @@ const CustomersPage = () => {
         await axios.delete(`/customer/${id}`)
         mutate('/customer')
     }
+
     return (
         <>
             <div>
                 <div className="flex gap-2 mb-5">
                     <Input
                         placeholder="Search Customer"
-                        prefix={<SearchOutlined
-                            className="!text-gray-500 mr-1" />}
+                        prefix={<SearchOutlined className="!text-gray-500 mr-1" />}
                         onChange={onSearch}
                     />
 
@@ -163,44 +158,28 @@ const CustomersPage = () => {
                         icon={<UserAddOutlined />}
                         onClick={() => setOpen(true)}>Add Customer
                     </Button>
-
-
                 </div>
+
                 <Divider />
+
                 <Table
                     columns={column}
                     dataSource={filter.length > 0 ? filter : data}
                     rowKey="_id"
                 />
+
+                {/* Add Customer Modal */}
                 <Modal onCancel={() => setOpen(false)} maskClosable={false} open={open} footer={null} title="Add Customers">
                     <Divider />
-
                     <Form layout="vertical" onFinish={addCustomer}>
-                        <Form.Item
-                            label="Customers Name:"
-                            rules={[{ required: true }]}
-                            name="fullname"
-                        >
+                        <Form.Item label="Customers Name:" rules={[{ required: true }]} name="fullname">
                             <Input size="large" placeholder="Mr. Gururaj" />
                         </Form.Item>
-
-                        <Form.Item
-                            label="Email:"
-                            rules={[{ required: true }]}
-                            name="email"
-                        >
+                        <Form.Item label="Email:" rules={[{ required: true }]} name="email">
                             <Input size="large" placeholder="example@gmail.com" />
                         </Form.Item>
-
-                        <Form.Item
-                            label="Mobile:"
-                            rules={[{ required: true }]}
-                            name="mobile"
-                        >
-                            <PhoneInput
-                                country={'in'}
-                                inputClass="!w-full"
-                            />
+                        <Form.Item label="Mobile:" rules={[{ required: true }]} name="mobile">
+                            <PhoneInput country={'in'} inputClass="!w-full" />
                         </Form.Item>
                         <Form.Item>
                             <Button icon={<UserAddOutlined />} type="primary" size="large" htmlType="submit">Add Now</Button>
@@ -208,30 +187,31 @@ const CustomersPage = () => {
                     </Form>
                 </Modal>
 
-                <Modal open={importCustomer} footer={null} title="Import Customer Records" onCancel={()=> setImportCustomer(false)}>
-                 <Divider/>
-                <div className="grid grid-cols-2">
-                    <div className="space-y-4">
-                        <h1 className="text-lg font-semibold">Download XLS File Format</h1>
-                        <Button icon={<DownloadOutlined/>} size="large" onClick={downloadSample}>Download Sample</Button>
-                    </div>
-                    <div className="flex justify-center">
-                        <Button className="!w-[100px] !h-[100px] flex flex-col !text-lg relative" > 
-                            <UploadOutlined className="text-3xl"/>
-                            Upload XLS
-                            <Input 
-                            type="file"
-                            accept=".xls , .xlsx " 
-                            className="!w-full !h-full !absolute !top-0 !left-0 !opacity-0 "
-                            onChange={ImportXlsFile}
-                            />
+                {/* Import Customer Modal */}
+                <Modal open={importCustomer} footer={null} title="Import Customer Records" onCancel={() => setImportCustomer(false)}>
+                    <Divider />
+                    <div className="grid grid-cols-2">
+                        <div className="space-y-4">
+                            <h1 className="text-lg font-semibold">Download XLS File Format</h1>
+                            <Button icon={<DownloadOutlined />} size="large" onClick={downloadSample}>Download Sample</Button>
+                        </div>
+                        <div className="flex justify-center">
+                            <Button className="!w-[100px] !h-[100px] flex flex-col !text-lg relative">
+                                <UploadOutlined className="text-3xl" />
+                                Upload XLS
+                                <Input
+                                    type="file"
+                                    accept=".xls,.xlsx"
+                                    className="!w-full !h-full !absolute !top-0 !left-0 !opacity-0"
+                                    onChange={ImportXlsFile}
+                                />
                             </Button>
+                        </div>
                     </div>
-                </div>           
                 </Modal>
             </div>
         </>
-    );
-};
+    )
+}
 
-export default CustomersPage;
+export default CustomersPage
