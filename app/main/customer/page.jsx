@@ -32,6 +32,18 @@ const CustomersPage = () => {
         }
     }
 
+     const updateCustomer = async (values) => {
+        try {
+            const { data } = await axios.put(`/customer/${editingCustomer._id}`, values)
+            toast.success('Customer Updated Successfully!', { position: 'top-center' })
+            setEditOpen(false)
+            setEditingCustomer(null)
+            mutate('/customer')
+        } catch (err) {
+            toast.error(err.message, { position: 'top-center' })
+        }
+    }
+
     // ✅ Search with debounce
     const onSearch = lodash.debounce((event) => {
         const key = event.target.value.trim().toLowerCase()
