@@ -80,24 +80,10 @@ const LandingPage = () => {
             >
               Go to Dashboard →
             </Button>
-            <Button 
-              size="large" 
-              className="!h-12 !px-8 !text-base font-semibold"
-            >
-              Watch Demo
-            </Button>
+            
           </div>
 
-          <div className="flex items-center justify-center gap-6 mt-8 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-500" />
-              <span>No credit card required</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-500" />
-              <span>14-day free trial</span>
-            </div>
-          </div>
+          
         </div>
 
         {/* Stats Section */}
