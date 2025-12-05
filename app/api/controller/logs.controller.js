@@ -12,7 +12,7 @@ export const createLog = async (req, res) => {
 
 export const fetchLog = async (req, res) => {
   try {
-    const logs = await logModel.find();
+    const logs = await logModel.find().populate('customer' , 'fullname email mobile');
     res.json(logs);
   } catch (err) {
     res.status(500).json(err);
